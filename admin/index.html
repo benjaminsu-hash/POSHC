@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin – POSHC</title>
+  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .admin-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 24px 0; }
+    .admin-bar input[type="search"] { flex: 1 1 220px; font: inherit; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 999px; }
+    .admin-bar .count { margin-left: auto; color: var(--muted); }
+    .btn-dark { background: var(--ink); color: #fff; border-color: var(--ink); cursor: pointer; font: inherit; font-weight: 700; }
+    .btn-dark:hover { background: #333; border-color: #333; }
+    .enquiry-list { display: grid; gap: 16px; }
+    .enquiry { background: var(--green); border-radius: 20px; padding: 20px 22px; }
+    .enquiry:nth-child(even) { background: var(--salmon); }
+    .enquiry h3 { margin: 0 0 4px; font-size: 1.25rem; }
+    .enquiry .when { font-size: .85rem; margin-bottom: 10px; }
+    .enquiry dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+    .enquiry dt { font-weight: 700; }
+    .enquiry dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .enquiry a { color: inherit; font-weight: 700; }
+    .login-box { max-width: 420px; }
+    .error { background: var(--salmon); padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="/"><img src="/images/logo.png" alt="POSHC" width="901" height="342"></a>
+      <div class="header-actions">
+        <button class="btn btn-outline" id="logout" type="button" hidden>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <h1 class="dash-title">Enquiries</h1>
+
+        <!-- Login -->
+        <div id="login-view" class="login-box" hidden>
+          <p class="section-intro">Log in to view enquiries submitted through the website.</p>
+          <div class="error" id="login-error" role="alert" hidden></div>
+          <form id="login-form" class="enquiry-form">
+            <div class="field"><label for="email">Email</label>
+              <input id="email" type="email" required autocomplete="username"></div>
+            <div class="field"><label for="password">Password</label>
+              <input id="password" type="password" required autocomplete="current-password"></div>
+            <button class="btn btn-primary btn-lg" type="submit">Log in</button>
+          </form>
+        </div>
+
+        <!-- Enquiries -->
+        <div id="list-view" hidden>
+          <div class="admin-bar">
+            <input type="search" id="search" placeholder="Search name, email, child…" aria-label="Search enquiries">
+            <button class="btn btn-dark" id="refresh" type="button">Refresh</button>
+            <button class="btn btn-dark" id="export" type="button">Export CSV</button>
+            <span class="count" id="count"></span>
+          </div>
+          <div class="enquiry-list" id="enquiries"></div>
+        </div>
+
+        <p id="status" class="section-intro">Loading…</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const FIELDS = [
+      ['email', 'Email'], ['phone', 'Phone'], ['child-first-name', 'Child'],
+      ['year-level', 'Year / age'], ['care', 'Care needed'], ['start-date', 'Start date'], ['message', 'Message'],
+    ];
+    let all = [];
+
+    const asText = (v) => Array.isArray(v) ? v.join(', ') : (v ?? '');
+
+    function show(view) {
+      $('login-view').hidden = view !== 'login';
+      $('list-view').hidden = view !== 'list';
+      $('logout').hidden = view !== 'list';
+      $('status').hidden = view !== 'status';
+    }
+
+    async function load() {
+      $('status').textContent = 'Loading…'; show('status');
+      let res;
+      try { res = await fetch('/api/admin/enquiries', { credentials: 'same-origin' }); }
+      catch { $('status').textContent = 'Could not reach the server. Try again.'; return; }
+      if (res.status === 401 || res.status === 403) { show('login'); return; }
+      if (!res.ok) { $('status').textContent = 'Something went wrong loading enquiries.'; return; }
+      all = (await res.json()).enquiries;
+      render(); show('list');
+    }
+
+    function render() {
+      const q = $('search').value.trim().toLowerCase();
+      const rows = all.filter(e => !q || JSON.stringify(e).toLowerCase().includes(q));
+      $('count').textContent = `${rows.length} of ${all.length}`;
+      const box = $('enquiries'); box.replaceChildren();
+      if (!rows.length) {
+        const p = document.createElement('p'); p.textContent = all.length ? 'No matches.' : 'No enquiries yet.';
+        box.append(p); return;
+      }
+      for (const e of rows) {
+        const card = document.createElement('article'); card.className = 'enquiry';
+        const h = document.createElement('h3'); h.textContent = asText(e['parent-name']) || '(no name)';
+        const when = document.createElement('div'); when.className = 'when';
+        when.textContent = e.receivedAt ? new Date(e.receivedAt).toLocaleString() : '';
+        const dl = document.createElement('dl');
+        for (const [key, label] of FIELDS) {
+          const val = asText(e[key]); if (!val) continue;
+          const dt = document.createElement('dt'); dt.textContent = label;
+          const dd = document.createElement('dd');
+          if (key === 'email') { const a = document.createElement('a'); a.href = 'mailto:' + val; a.textContent = val; dd.append(a); }
+          else if (key === 'phone') { const a = document.createElement('a'); a.href = 'tel:' + val.replace(/\s+/g, ''); a.textContent = val; dd.append(a); }
+          else dd.textContent = val;
+          dl.append(dt, dd);
+        }
+        card.append(h, when, dl); box.append(card);
+      }
+    }
+
+    function exportCsv() {
+      const cols = ['receivedAt', 'parent-name', ...FIELDS.map(f => f[0])];
+      const esc = (v) => {
+        let s = String(asText(v));
+        if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // avoid spreadsheet formula injection
+        return '"' + s.replace(/"/g, '""') + '"';
+      };
+      const csv = [cols.join(','), ...all.map(e => cols.map(c => esc(e[c])).join(','))].join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = 'poshc-enquiries.csv'; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    $('login-form').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const err = $('login-error'); err.hidden = true;
+      const res = await fetch('/api/admin/login', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: $('email').value, password: $('password').value }),
+      });
+      if (res.ok) { $('password').value = ''; load(); return; }
+      let msg = 'Could not log in.'; try { msg = (await res.json()).error || msg; } catch {}
+      err.textContent = msg; err.hidden = false;
+    });
+    $('logout').addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' });
+      all = []; show('login');
+    });
+    $('refresh').addEventListener('click', load);
+    $('export').addEventListener('click', exportCsv);
+    $('search').addEventListener('input', render);
+
+    load();
+  </script>
+</body>
+</html>
