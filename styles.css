@@ -87,3 +87,18 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 0 0 12px; }
 .dash-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .dash-panel { background: var(--green); border-radius: 24px; padding: 28px; }
 .dash-panel[hidden] { display: none; }
+
+/* Enquiry form */
+.form-wrap { max-width: 640px; }
+.privacy-note { background: var(--salmon); border-radius: 16px; padding: 14px 18px; margin: 20px 0 28px; }
+.enquiry-form .field { margin-bottom: 20px; border: 0; padding: 0; }
+.enquiry-form label, .enquiry-form legend { display: block; font-weight: 700; margin-bottom: 6px; padding: 0; }
+.enquiry-form input[type="text"], .enquiry-form input[type="email"], .enquiry-form input[type="tel"],
+.enquiry-form input[type="date"], .enquiry-form textarea {
+  width: 100%; font: inherit; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 12px; background: #fff;
+}
+.enquiry-form input:focus-visible, .enquiry-form textarea:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+.enquiry-form .check { display: flex; align-items: center; gap: 10px; font-weight: 400; margin-bottom: 6px; }
+.enquiry-form .check input { width: 20px; height: 20px; accent-color: var(--ink); }
+.enquiry-form button { cursor: pointer; font: inherit; font-weight: 700; }
+.hp { position: absolute; left: -9999px; }

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enquire – POSHC</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="POSHC" width="901" height="342"></a>
+      <div class="header-actions">
+        <a class="btn btn-outline" href="index.html">&larr; Back to site</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container form-wrap">
+        <h1 class="dash-title">Make an enquiry</h1>
+        <p class="section-intro">Tell us a little about what you’re looking for and we’ll be in touch to answer questions and talk through next steps.</p>
+        <p class="privacy-note"><strong>Please don’t include</strong> medical details, ID documents, birth dates or home addresses. We’ll collect anything like that securely later, if needed.</p>
+
+        <form name="enquiry" method="POST" action="thanks.html" data-netlify="true" netlify-honeypot="bot-field" class="enquiry-form">
+          <input type="hidden" name="form-name" value="enquiry">
+          <p class="hp" aria-hidden="true"><label>Don’t fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+          <div class="field"><label for="parent-name">Your name</label>
+            <input id="parent-name" name="parent-name" type="text" required autocomplete="name"></div>
+
+          <div class="field"><label for="email">Email</label>
+            <input id="email" name="email" type="email" required autocomplete="email"></div>
+
+          <div class="field"><label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+
+          <div class="field"><label for="child-first-name">Child’s first name</label>
+            <input id="child-first-name" name="child-first-name" type="text"></div>
+
+          <div class="field"><label for="year-level">Child’s school year (or age)</label>
+            <input id="year-level" name="year-level" type="text" placeholder="e.g. Year 2"></div>
+
+          <fieldset class="field">
+            <legend>Care needed</legend>
+            <label class="check"><input type="checkbox" name="care" value="Before school"> Before school</label>
+            <label class="check"><input type="checkbox" name="care" value="After school"> After school</label>
+            <label class="check"><input type="checkbox" name="care" value="Vacation care"> Vacation care</label>
+          </fieldset>
+
+          <div class="field"><label for="start-date">Ideal start date</label>
+            <input id="start-date" name="start-date" type="date"></div>
+
+          <div class="field"><label for="message">Anything else you’d like us to know?</label>
+            <textarea id="message" name="message" rows="5"></textarea></div>
+
+          <button class="btn btn-primary btn-lg" type="submit">Send enquiry</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>&copy; <span id="year">2026</span> POSHC. All rights reserved.</p></div>
+  </footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
