@@ -3,3 +3,10 @@
   # Skip builds on every branch except main, so PRs and branch pushes
   # don't use Netlify credits. Exit 0 = skip build, exit 1 = build.
   ignore = "test \"$BRANCH\" != \"main\""
+
+# Keep the admin area out of search engines
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
