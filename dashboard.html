@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard – POSHC</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="POSHC" width="901" height="342"></a>
+      <div class="header-actions">
+        <a class="btn btn-outline" href="index.html">&larr; Back to site</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <h1 class="dash-title">Welcome to POSHC</h1>
+        <p class="section-intro">Everything you need to get started with Paradise Out Of School Hours Care.</p>
+
+        <div class="dash-buttons" role="tablist" aria-label="Dashboard sections">
+          <button class="dash-btn" role="tab" aria-selected="false" aria-controls="panel-expect" id="tab-expect" data-panel="expect">What to expect</button>
+          <button class="dash-btn" role="tab" aria-selected="false" aria-controls="panel-info" id="tab-info" data-panel="info">Key info</button>
+          <button class="dash-btn" role="tab" aria-selected="false" aria-controls="panel-tutorials" id="tab-tutorials" data-panel="tutorials">App tutorials</button>
+        </div>
+
+        <div class="dash-panel" id="panel-expect" role="tabpanel" aria-labelledby="tab-expect" hidden>
+          <h2>What to expect</h2>
+          <ul class="info-list">
+            <li>A warm welcome from our educators when your child arrives.</li>
+            <li>Play-based activities, sport, arts and quiet time.</li>
+            <li>A healthy snack every afternoon.</li>
+            <li>Safe sign-in and sign-out at every session.</li>
+          </ul>
+          <p class="note">Placeholder content – replace with your real information.</p>
+        </div>
+
+        <div class="dash-panel" id="panel-info" role="tabpanel" aria-labelledby="tab-info" hidden>
+          <h2>Key info</h2>
+          <ul class="info-list">
+            <li><strong>Open:</strong> 6:30am – 6:00pm</li>
+            <li><strong>Phone:</strong> <a href="tel:0433013304">0433 013 304</a></li>
+            <li><strong>What to bring:</strong> hat, water bottle, change of clothes.</li>
+            <li><strong>Absences:</strong> please let us know as early as possible.</li>
+          </ul>
+          <p class="note">Placeholder content – replace with your real information.</p>
+        </div>
+
+        <div class="dash-panel" id="panel-tutorials" role="tabpanel" aria-labelledby="tab-tutorials" hidden>
+          <h2>App tutorials</h2>
+          <ol class="info-list">
+            <li>Download the app and sign in.</li>
+            <li>Add or view your child’s bookings.</li>
+            <li>Sign your child in and out.</li>
+            <li>Update your contact details.</li>
+          </ol>
+          <p class="note">Placeholder content – replace with your real steps, videos or screenshots.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>&copy; <span id="year">2026</span> POSHC. All rights reserved.</p></div>
+  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const btns = document.querySelectorAll('.dash-btn');
+    function show(name) {
+      btns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.panel === name)));
+      document.querySelectorAll('.dash-panel').forEach(p => p.hidden = p.id !== 'panel-' + name);
+    }
+    btns.forEach(b => b.addEventListener('click', () => { show(b.dataset.panel); history.replaceState(null, '', '#' + b.dataset.panel); }));
+    const start = location.hash.slice(1);
+    if (['expect', 'info', 'tutorials'].includes(start)) show(start);
+  </script>
+</body>
+</html>
