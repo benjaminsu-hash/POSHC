@@ -6,5 +6,5 @@ Plain HTML/CSS – no build step. Open `index.html` in a browser, or run `python
 
 ## To do
 - Set the **Enrol Now** link (`#enrol-now`, `#enrol-hero`, `#enrol-contact` in `index.html`)
-- Set the **Parent Portal** link (`#parent-portal` in `index.html`)
+- Parent Portal currently links to `dashboard.html`
 - Replace placeholder hours, fees and contact details
