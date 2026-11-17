@@ -1,23 +1,28 @@
-import { getUser } from "@netlify/identity"
-import { getStore } from "@netlify/blobs"
+import { getDatabase } from "@netlify/database"
 import type { Config } from "@netlify/functions"
+import { requireAdmin } from "../lib/auth.mts"
 
 export default async (req: Request) => {
   if (req.method !== "GET") return new Response("Method not allowed", { status: 405 })
+  const denied = await requireAdmin(req)
+  if (denied) return denied
 
-  const user: any = await getUser()
-  if (!user) return new Response("Unauthorized", { status: 401 })
-  const roles: string[] = user.roles ?? user.app_metadata?.roles ?? []
-  if (!roles.includes("admin")) return new Response("Forbidden", { status: 403 })
+  const db = getDatabase()
+  const enquiries = await db.sql`
+    SELECT id,
+           received_at      AS "receivedAt",
+           parent_name      AS "parentName",
+           email, phone,
+           child_first_name AS "childFirstName",
+           year_level       AS "yearLevel",
+           care,
+           start_date::text AS "startDate",
+           message, status, notes
+    FROM enquiries
+    ORDER BY received_at DESC
+    LIMIT 1000`
 
-  const store = getStore("enquiries")
-  const { blobs } = await store.list()
-  const entries = await Promise.all(
-    blobs.map(async (b) => ({ id: b.key, ...((await store.get(b.key, { type: "json" })) as object) }))
-  )
-  entries.sort((a: any, b: any) => String(b.receivedAt).localeCompare(String(a.receivedAt)))
-
-  return Response.json({ enquiries: entries }, { headers: { "Cache-Control": "no-store" } })
+  return Response.json({ enquiries }, { headers: { "Cache-Control": "no-store" } })
 }
 
 export const config: Config = { path: "/api/admin/enquiries" }

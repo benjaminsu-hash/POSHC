@@ -10,7 +10,9 @@ Plain HTML/CSS – no build step. Open `index.html` in a browser, or run `python
 - Replace placeholder hours, fees and contact details
 
 ## Enquiries admin (`/admin/`)
-Enquiry form submissions are copied into a private Netlify Blobs store by `netlify/functions/save-enquiry.mts`; the admin page reads them behind a Netlify Identity login (role `admin`).
+Enquiry form submissions are saved to a Netlify Database (Postgres) table `enquiries` by `netlify/functions/save-enquiry.mts` (schema in `netlify/database/migrations/`). The admin page reads and manages them behind a Netlify Identity login (role `admin`): change status (new/contacted/enrolled/closed), add internal notes, delete, export CSV.
+
+Enquiries older than 12 months are deleted automatically on the 1st of each month (`purge-old-enquiries.mts`, change `RETENTION_MONTHS` to adjust).
 
 One-time Netlify setup (dashboard only, after this is merged and deployed):
 1. **Forms → Enable form detection**, then redeploy.
@@ -19,3 +21,5 @@ One-time Netlify setup (dashboard only, after this is merged and deployed):
 4. Optional: **Forms → Notifications** to get an email for each enquiry.
 
 Only enquiries received after this is deployed appear in `/admin/`; earlier ones stay in the Netlify Forms tab.
+
+The database is provisioned and migrations applied automatically on the first deploy to `main` (needs a Credit-based Netlify plan). Never edit an applied migration; add a new one instead.
