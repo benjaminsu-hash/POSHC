@@ -1,2 +1,5 @@
 [build]
   publish = "."
+  # Skip builds on every branch except main, so PRs and branch pushes
+  # don't use Netlify credits. Exit 0 = skip build, exit 1 = build.
+  ignore = "test \"$BRANCH\" != \"main\""
